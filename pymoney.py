@@ -1,4 +1,6 @@
 
+import time
+
 class connect(object):
 
     # 0=user,1=money
@@ -19,6 +21,9 @@ class connect(object):
             self.cursor = self.conn.cursor()
         else:
             raise Exception("Database Not Selected")
+        
+    def time(self):
+        return str(int(time.time()))
 
     def close(self):
         self.conn.commit()
@@ -26,7 +31,7 @@ class connect(object):
 
     def init_database(self):
         self.cursor.execute("CREATE TABLE user (user text, money text)")
-        self.cursor.execute("CREATE TABLE logs (fromuser text, touser text, money text)")
+        self.cursor.execute("CREATE TABLE logs (fromuser text, touser text, money text, time text)")
         self.conn.commit()
         return
 
@@ -70,9 +75,9 @@ class connect(object):
             self.cursor.execute("UPDATE user SET money=%s WHERE user=%s", (value, user,))
         if not nologs:
             if self.database == "sqlite":
-                self.conn.execute("insert into logs (fromuser, touser, money) values (?,?,?)", ("system", user, money ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?)", ("system", user, money, self.time(), ))
             else:
-                self.conn.execute("insert into logs (fromuser, touser, money) values (%s,%s,%s)", ("system", user, money ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s)", ("system", user, money, self.time(), ))
         self.conn.commit()
         return float(value)/100
 
@@ -93,9 +98,9 @@ class connect(object):
             self.cursor.execute("UPDATE user SET money=%s WHERE user=%s", (value, user, ))
         if not nologs:
             if self.database == "sqlite":
-                self.conn.execute("insert into logs (fromuser, touser, money) values (?,?,?)", (user, "system", money ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?)", (user, "system", money, self.time(), ))
             else:
-                self.conn.execute("insert into logs (fromuser, touser, money) values (%s,%s,%s)", (user, "system", money ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s)", (user, "system", money, self.time(), ))
         self.conn.commit()
         return float(value)/100
 
@@ -105,9 +110,9 @@ class connect(object):
         self.income(touser, money, True)
         if not nologs:
             if self.database == "sqlite":
-                self.conn.execute("insert into logs (fromuser, touser, money) values (?,?,?)", (fromuser, touser, money ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?)", (fromuser, touser, money, self.time(), ))
             else:
-                self.conn.execute("insert into logs (fromuser, touser, money) values (%s,%s,%s)", (fromuser, touser, money ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s)", (fromuser, touser, money, self.time(), ))
         self.conn.commit()
         return
 
