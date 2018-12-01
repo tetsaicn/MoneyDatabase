@@ -75,9 +75,9 @@ class connect(object):
             self.cursor.execute("UPDATE user SET money=%s WHERE user=%s", (value, user,))
         if not nologs:
             if self.database == "sqlite":
-                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?)", ("system", user, money, self.time(), ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?,?)", ("system", user, money, self.time(), ))
             else:
-                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s)", ("system", user, money, self.time(), ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s,%s)", ("system", user, money, self.time(), ))
         self.conn.commit()
         return float(value)/100
 
@@ -98,9 +98,9 @@ class connect(object):
             self.cursor.execute("UPDATE user SET money=%s WHERE user=%s", (value, user, ))
         if not nologs:
             if self.database == "sqlite":
-                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?)", (user, "system", money, self.time(), ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?,？)", (user, "system", money, self.time(), ))
             else:
-                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s)", (user, "system", money, self.time(), ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s,%s)", (user, "system", money, self.time(), ))
         self.conn.commit()
         return float(value)/100
 
@@ -110,9 +110,9 @@ class connect(object):
         self.income(touser, money, True)
         if not nologs:
             if self.database == "sqlite":
-                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?)", (fromuser, touser, money, self.time(), ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (?,?,?,?)", (fromuser, touser, money, self.time(), ))
             else:
-                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s)", (fromuser, touser, money, self.time(), ))
+                self.conn.execute("insert into logs (fromuser, touser, money, time) values (%s,%s,%s,%s)", (fromuser, touser, money, self.time(), ))
         self.conn.commit()
         return
 
