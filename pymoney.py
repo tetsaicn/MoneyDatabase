@@ -26,6 +26,7 @@ class connect(object):
 
     def init_database(self):
         self.cursor.execute("CREATE TABLE user (user text, money text)")
+        self.cursor.execute("CREATE TABLE logs (fromuser text, touser text, money text)")
         self.conn.commit()
         return
 
@@ -52,7 +53,7 @@ class connect(object):
         self.conn.commit()
         return
 
-    def income(self, user, money):
+    def income(self, user, money, nologs=False):
         user = str(user)
         money = str(money)
         if self.database == "sqlite":
@@ -67,10 +68,15 @@ class connect(object):
             self.conn.execute("UPDATE user SET money=? WHERE user=?", (value, user,))
         else:
             self.cursor.execute("UPDATE user SET money=%s WHERE user=%s", (value, user,))
+        if not nologs:
+            if self.database == "sqlite":
+                self.conn.execute("insert into logs (fromuser, touser, money) values (?,?,?)", ("system", user, money ))
+            else:
+                self.conn.execute("insert into logs (fromuser, touser, money) values (%s,%s,%s)", ("system", user, money ))
         self.conn.commit()
         return float(value)/100
 
-    def expenditure(self, user, money):
+    def expenditure(self, user, money, nologs=False):
         user = str(user)
         money = str(money)
         if self.database == "sqlite":
@@ -85,5 +91,35 @@ class connect(object):
             self.conn.execute("UPDATE user SET money=? WHERE user=?", (value, user, ))
         else:
             self.cursor.execute("UPDATE user SET money=%s WHERE user=%s", (value, user, ))
+        if not nologs:
+            if self.database == "sqlite":
+                self.conn.execute("insert into logs (fromuser, touser, money) values (?,?,?)", (user, "system", money ))
+            else:
+                self.conn.execute("insert into logs (fromuser, touser, money) values (%s,%s,%s)", (user, "system", money ))
         self.conn.commit()
         return float(value)/100
+
+    def transfer(self, fromuser, touser, money, nologs=False):
+        money = str(money)
+        self.expenditure(fromuser, money, True)
+        self.income(touser, money, True)
+        if not nologs:
+            if self.database == "sqlite":
+                self.conn.execute("insert into logs (fromuser, touser, money) values (?,?,?)", (fromuser, touser, money ))
+            else:
+                self.conn.execute("insert into logs (fromuser, touser, money) values (%s,%s,%s)", (fromuser, touser, money ))
+        self.conn.commit()
+        return
+
+    def query_logs(self, user):
+        if self.database == "sqlite":
+            self.cursor.execute("select * from logs where fromuser=?", (user, ))
+        else:
+            self.cursor.execute("select * from logs where fromuser=%s", (user, ))
+        values = self.cursor.fetchall()
+        if self.database == "sqlite":
+            self.cursor.execute("select * from logs where touser=?", (user, ))
+        else:
+            self.cursor.execute("select * from logs where touser=%s", (user, ))
+        values.append(self.cursor.fetchall())
+        return values

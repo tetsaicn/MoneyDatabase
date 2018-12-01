@@ -25,6 +25,9 @@ data.income("tetsai", "99.99")             #增加某个用户的余额，返回
 data.expenditure("tetsai", "99.99")        #减少某个用户的余额，返回操作后的值
 data.income("tetsai", 134.52)              #增加某个用户的余额，返回操作后的值
 data.expenditure("tetsai", 34.51)          #减少某个用户的余额，返回操作后的值
+data.transfer("tetsaia", "tetsaib", 10)    #从tetsaia转10元到tetsaib
 data.get("tetsai")                         #获取某个用户的余额
+data.query_logs("tetsai")                  #查询tetsai用户的日志（包括转入/转出）
 data.close()                               #关闭数据库连接
 ```
+income/expenditure/transfer均有日志可循，如果想不记录本次交易，设置参数```nologs=True```即可
